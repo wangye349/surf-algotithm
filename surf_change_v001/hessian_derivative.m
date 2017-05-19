@@ -1,30 +1,30 @@
 function [outxx,outyy,outxy] = hessian_derivative(input_size)
 syms x;
 syms y;
-if input_size == 9
+% if input_size == 9
+%     sig = 1.2;
+% elseif input_size == 15
+%     sig = 2;
+% elseif input_size == 21
+%             sig = 2.5;
+% elseif input_size == 27
+%                 sig = 3;
+% else
+%     sig = 4;
+% end
     sig = 1.2;
-elseif input_size == 15
-    sig = 2;
-elseif input_size == 21
-            sig = 2.5;
-elseif input_size == 27
-                sig = 3;
-else
-    sig = 4;
-end
-    %sig = 1.2;
-f = 1/(2 * pi * sig^2) * exp(-((x^2 + y^2)/2*sig^2));
+f = 1/(2 * pi * sig^2) * exp(-((x^2 + y^2)/(2*sig^2)));
 a = inline(diff(f,x,2));
 b = inline(diff(f,y,2));
 c = diff(f,x);
 d = inline(diff(c,y));
 q = (input_size - 1)/2 + 1;
-outxx_temp = zeros(input_size,input_size);
-outyy_temp = zeros(input_size,input_size);
-outxy_temp = zeros(input_size,input_size);
-outxx = zeros(input_size,input_size);
-outyy = zeros(input_size,input_size);
-outxy = zeros(input_size,input_size);
+% outxx_temp = zeros(input_size,input_size);
+% outyy_temp = zeros(input_size,input_size);
+% outxy_temp = zeros(input_size,input_size);
+% outxx = zeros(input_size,input_size);
+% outyy = zeros(input_size,input_size);
+% outxy = zeros(input_size,input_size);
 for i = 1:input_size
     for j = 1:input_size
         k = i - q;
@@ -32,6 +32,17 @@ for i = 1:input_size
         outxx_temp(i,j) = a(k,p);
         outyy_temp(i,j) = b(k,p);
         outxy_temp(i,j) = d(k,p);
+    end
+end
+
+repair = sum(sum(outxx_temp))/(input_size^2);
+for i = 1:input_size
+    for j = 1:input_size
+        k = i - q;
+        p = j - q;
+        outxx(i,j) = (a(k,p) - repair);
+        outyy(i,j) = (b(k,p) - repair);
+        outxy(i,j) = (d(k,p));
     end
 end
 % for i = 1:input_size
@@ -217,16 +228,7 @@ end
 %         outxy(i,j) = outxy(i,j) / 1000;
 %     end
 % end
-repair = sum(sum(outxx_temp))/(input_size^2);
-for i = 1:input_size
-    for j = 1:input_size
-        k = i - q;
-        p = j - q;
-        outxx(i,j) = (a(k,p) - repair);
-        outyy(i,j) = (b(k,p) - repair);
-        outxy(i,j) = (d(k,p));
-    end
-end
+
 
 
 end
